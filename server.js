@@ -1,10 +1,15 @@
 const express = require('express')
 const morgan = require('morgan')
-const routes = require('./src/routes')
 const cors = require('cors')
+const routes = require('./src/routes')
+
+const dbConnect = require('./src/lib/mongodb')
 
 const app = express()
 const port = 3000
+
+// connect to DB
+dbConnect()
 
 app.use(morgan('combined'))
 app.use(express.static('public'))

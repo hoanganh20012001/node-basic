@@ -1,32 +1,68 @@
+const User = require('../models/users.model')
+
 module.exports = {
   // GET all users
-  index(req, res) {
-    res.json([
-      'Get all users'
-    ])
+  async index(req, res) {
+    try {
+      const users = await User.find({})
+      res.json({ data: users })
+    } catch (error) {
+      console.log(error)
+    }
   },
   // Create a user
-  store(req, res) {
-    res.json([
-      'Create user'
-    ])
+  async store(req, res) {
+    try {
+      const user = new User({
+        name: req.body.name,
+        email: req.body.email,
+        password: req.body.password,
+      })
+      const newUser = await user.save()
+      res.status(201).json({ data: newUser })
+      
+    } catch (error) {
+      console.log(error)
+    }
   },
-  // GET  a user by ID
-  show(req, res) {
-    res.json([
-      'A user'
-    ])
+  // GET an user by ID
+   async show(req, res) {
+    try {
+      const user = await User.findById(req.params.id).exec()
+      if (!user) {
+        return res.status(404).json({ data: {
+          code: 404,
+          message: 'Not found'
+        }})
+      }
+      res.json({ data: user })
+    
+    } catch (error) {
+      console.log(error)
+    }
   },
   // Update a user 
-  update(req, res) {
-    res.json([
-      'Update user'
-    ])
+  async update(req, res) {
+    await User.findOneAndUpdate({
+      _id: req.params.id,
+    }, {
+      name: req.body.name,
+      email: req.body.email,
+      password: req.body.password,
+    })
+    const user = await User.findById(req.params.id).exec()
+    res.json({ data: user })
   },
   // Delete a user by ID
-  destroy(req, res) {
-    res.json([
-      'Delete user'
-    ])
+  async destroy(req, res) {
+    const user = await User.findByIdAndDelete(req.params.id)
+    if (!user) {
+      res.status(404).json({ data: {
+        code: 404,
+        message: 'Not found'
+      }})
+    }
+
+    res.status(200).json({ data: { message: "Successfull !" }})
   }
 }
